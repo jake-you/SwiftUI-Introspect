@@ -55,10 +55,32 @@ public struct UIKitIntrospectionView<TargetViewType: UIView>: UIViewRepresentabl
     ) {
         DispatchQueue.main.async {
             guard let targetView = self.selector(uiView) else {
+                _updateUIView(uiView, context: context, retry: C.maxRetry)
+                return
+            }
+            self.customize(targetView)
+        }
+    }
+    
+    private func _updateUIView(
+        _ uiView: IntrospectionUIView,
+        context: UIViewRepresentableContext<UIKitIntrospectionView>,
+        retry: Int
+    ) {
+        guard retry > 0 else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard let targetView = self.selector(uiView) else {
+                _updateUIView(uiView, context: context, retry: (retry - 1))
                 return
             }
             self.customize(targetView)
         }
     }
 }
+
+fileprivate struct C {
+    static let maxRetry = 10
+}
+
 #endif
