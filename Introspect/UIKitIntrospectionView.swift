@@ -55,6 +55,19 @@ public struct UIKitIntrospectionView<TargetViewType: UIView>: UIViewRepresentabl
     ) {
         DispatchQueue.main.async {
             guard let targetView = self.selector(uiView) else {
+                _updateUIView(uiView, context: context)
+                return
+            }
+            self.customize(targetView)
+        }
+    }
+    
+    private func _updateUIView(
+        _ uiView: IntrospectionUIView,
+        context: UIViewRepresentableContext<UIKitIntrospectionView>
+    ) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard let targetView = self.selector(uiView) else {
                 return
             }
             self.customize(targetView)
